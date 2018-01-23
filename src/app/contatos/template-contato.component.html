@@ -1,0 +1,165 @@
+<form class="navbar-form navbar-right" >
+	<img style="text-align:center" src="../assets/images/agenda.png" width="50px" height="50px">
+	<label style="font-size:20px">Agenda de Contatos</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	
+  <div class="form-group" >
+     <label>Bem vindo, {{cookieService.get('usuarioNome')}}.</label>
+  </div>
+  <button type="submit" (click)="appService.logout()" mat-raised-button >
+  	Sair
+  	<i class="fa fa-sign-out"></i>
+  </button>
+</form>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div *ngIf="boAlertMessage" class="alert alert-success" role="alert">{{alertMessage}}</div>
+<div class="container" *ngIf="operacao === 'LISTANDO'">
+	<div class="col-md-12">
+		<h3>Lista de Contatos</h3>
+		
+		<table class="fullwidth" style="cellspacing:0">
+		    <tr>
+		      <td>
+		        <mat-form-field class="fullwidth">
+			      <input matInput placeholder="Pesquisa por nome" id="pesqNome" [(ngModel)]="pesqNome" name="pesqNome" maxlength="50" />
+			    </mat-form-field>
+		      </td>
+		      <td>
+		        <button type="button" mat-raised-button color="primary" (click)="pesquisarContatoPorNome(pesqNome)">
+					Pesquisar
+				<i class="fa fa-search"></i>
+				</button>
+		      </td>
+		    </tr>
+	  	</table>
+	  	
+		<table class="table table-condensed table-bordered table-striped table-hover ">
+			<thead>
+				<tr>
+					<th class="text-center">Nome</th>
+					<th class="text-center">E-mail</th>
+					<th class="text-center">Telefone</th>
+					<th class="text-center">Celular</th>
+					<th class="text-center">Ação</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let contato of contatos">
+					<td hidden="true">{{contato.idContato}}</td>
+					<td>{{contato.nome}}</td>
+					<td>{{contato.email}}</td>
+					<td>{{contato.telefone}}</td>
+					<td>{{contato.celular}}</td>
+					<td class="text-center" style="max-width:14%;width:14%">
+						<button mat-icon-button color="primary" (click)="visualizarContatoForm(contato)">
+					    <mat-icon>
+					    	<span matTooltip="Visualizar"><i class="fa fa-eye"></i></span>
+						</mat-icon>
+					  </button>
+					  <button mat-icon-button color="primary" (click)="editarContatoForm(contato)">
+						<mat-icon>
+					    	<span matTooltip="Editar"><i class="fa fa-edit"></i></span>
+						</mat-icon>
+					  </button>
+					  <button mat-icon-button color="warn" (click)="excluirContato(contato)">
+						<mat-icon>
+					    	<span matTooltip="Excluir"><i class="fa fa-trash"></i></span>
+						</mat-icon>
+					  </button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button mat-raised-button color="primary" (click)="novoContatoForm()">
+			Novo contato
+			<i class="fa fa-plus"></i>
+		</button>
+		<br/>
+	</div>
+</div>
+
+<form class="formWidth" #formContato="ngForm" *ngIf="operacao === 'CADASTRANDO' || operacao === 'VISUALIZANDO' || operacao === 'EDITANDO'">
+	<h3>Contato</h3>
+	<input id="idContato" [(ngModel)]="novoContato.idContato" name="idContato" hidden="true" />
+	<table class="fullwidth" style="cellspacing:0">
+	    <tr>
+	      <td>
+	        <mat-form-field class="fullwidth">
+	          <input  matInput placeholder="Nome" id="nome" [(ngModel)]="novoContato.nome" name="nome" [disabled]="operacao === 'VISUALIZANDO'"
+	          required minlength="2" maxlength="50" #nome="ngModel">
+	        </mat-form-field>
+	        <div *ngIf="nome.invalid && (nome.dirty || nome.touched)">
+					<mat-error *ngIf="nome.errors.required">Nome é obrigatório.</mat-error>
+					<mat-error *ngIf="nome.errors.minlength">Nome deve conter pelo
+						menos 2 caracteres.</mat-error>
+				</div>
+	      </td>
+	      <td>
+	        <mat-form-field class="fullwidth">
+	          <input matInput placeholder="Sobrenome" id="sobrenome" [(ngModel)]="novoContato.sobrenome" name="sobrenome" [disabled]="operacao === 'VISUALIZANDO'"
+	          maxlength="50">
+	        </mat-form-field>
+	      </td>
+	    </tr>
+  	</table>
+  	
+	<p>
+	    <mat-form-field class="fullwidth">
+	      <textarea matInput placeholder="Endereço" id="endereco" [(ngModel)]="novoContato.endereco" name="endereco" maxlength="200" [disabled]="operacao === 'VISUALIZANDO'"></textarea>
+	    </mat-form-field>
+  	</p>
+  	
+  	<p>
+	    <mat-form-field class="fullwidth">
+	      <input matInput placeholder="E-mail" id="email" [(ngModel)]="novoContato.email" name="email" maxlength="50" #email="ngModel" [disabled]="operacao === 'VISUALIZANDO'"/>
+	    </mat-form-field>
+  	</p>
+	
+	<p>
+	    <mat-form-field class="fullwidth">
+	      <input matInput placeholder="Data de Nascimento" type="date"  id="dataNascimento" 
+	      [(ngModel)]="novoContato.dataNascimento" name="dataNascimento" maxlength="50"  [disabled]="operacao === 'VISUALIZANDO'"/>
+	    </mat-form-field>
+  	</p>
+  	
+  	<table class="fullwidth" style="cellspacing:0">
+	    <tr>
+	      <td>
+	        <mat-form-field class="fullwidth">
+	          <input  matInput placeholder="Telefone" id="telefone" mask="(00) 0000-0000" [(ngModel)]="novoContato.telefone" name="telefone" [disabled]="operacao === 'VISUALIZANDO' "
+	          maxlength="14">
+	        </mat-form-field>
+	      </td>
+	      <td>
+	        <mat-form-field class="fullwidth">
+	          <input  matInput placeholder="Celular" mask="(00) 00000-0000" id="celular" [(ngModel)]="novoContato.celular" name="celular" [disabled]="operacao === 'VISUALIZANDO'"
+	          maxlength="15">
+	        </mat-form-field>
+	      </td>
+	      <td>
+	        <mat-form-field class="fullwidth">
+	          <input  matInput mask="(00) 00000-0000" clear-if-not-match="true" placeholder="Outro Celular" id="celular2" [(ngModel)]="novoContato.celular2" name="celular" [disabled]="operacao === 'VISUALIZANDO'"
+	          maxlength="15">
+	        </mat-form-field>
+	      </td>
+	    </tr>
+  	</table>
+  	
+  	<div class="panel-footer">
+	  	<p>
+	    	<button type="button" mat-raised-button color="primary" (click)="salvarContato(formContato.value)" [disabled]="!formContato.form.valid || operacao === 'VISUALIZANDO'">
+				Salvar
+			<i class="fa fa-save"></i>
+			</button>
+			<button mat-raised-button (click)="cancelarCadastroContato()">
+				Cancelar
+			</button>
+	  	</p>
+  	</div>
+</form>
